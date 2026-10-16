@@ -7,8 +7,8 @@ HW2 dataset source: https://github.com/Iuliia6456/paypilot-hw2
 Copy this repository's golden.jsonl into the evaluation kit's
 sets directory, then run from the evaluation kit directory:
 
-    docker compose run --rm eval --set golden --dry-run
-    docker compose run --rm eval --set golden --profile clean
+    docker compose run --rm eval --set hw3 --dry-run
+    docker compose run --rm eval --set hw3 --profile clean
     docker compose run --rm eval --set golden --profile lesson-04
 
 Use a local PayPilot stand with:
@@ -27,16 +27,16 @@ Validation was performed using a copy named sets/hw3.jsonl:
 
 | ID | Source | Corpus file and location |
 | --- | --- | --- |
-| RET-H01 | Complaint C-13, narrowed to Tier 3 allowance | tariffs.md - FX spreads by tier, Tier 3 row |
-| RET-H02 | Complaint C-14 | disputes.md - Reason codes and chargeback windows, full table |
-| RET-H03 | Corpus | limits.md - Daily and monthly limits by tier, Tier 1 row |
-| RET-H04 | Corpus | limits.md - Daily and monthly limits by tier, Tier 3 row |
-| RET-H05 | Corpus | disputes.md - Reason codes and chargeback windows, unauthorized_debit row |
-| RET-H06 | Corpus | tariffs.md - Transfer fees by type, SEPA row |
-| RET-H07 | Corpus | tariffs.md - Transfer fees by type, Card payment row and calculation-basis sentence |
-| RET-H08 | Corpus | disputes.md - Reason codes and chargeback windows, service_not_rendered row |
-| RET-H09 | Corpus | tariffs.md - FX spreads by tier, Tier 1 row and applicability sentence |
-| RET-H10 | Corpus | limits.md - Daily and monthly limits by tier, Tier 2 row |
+| RET-H01 | Complaint C-13, narrowed to Tier 3 allowance | tariffs.md, line 16 - Tier 3 spread and allowance |
+| RET-H02 | Complaint C-14 | disputes.md, “Reason codes and chargeback windows” table; line 11 - duplicate-charge window |
+| RET-H03 | Corpus | limits.md, line 11 - Tier 1 monthly limit |
+| RET-H04 | Corpus | limits.md, line 13 - Tier 3 daily limit |
+| RET-H05 | Corpus | disputes.md, line 13 - unauthorized_debit window |
+| RET-H06 | Corpus | tariffs.md, line 22 - SEPA fee |
+| RET-H07 | Corpus | tariffs.md, lines 24 and 26 - card-payment fee and calculation basis |
+| RET-H08 | Corpus | disputes.md, line 12 - service_not_rendered window |
+| RET-H09 | Corpus | tariffs.md, line 14 - Tier 1 spread; applicability paragraph beginning at line 9 |
+| RET-H10 | Corpus | limits.md, line 12 - Tier 2 monthly limit |
 
 The contains assertions check selected text in the answer.
 They do not prove that search occurred or that every statement
@@ -46,8 +46,8 @@ is correct. Retrieval failures will be diagnosed from traces.
 
 | Run | Profile | Result | Report |
 | --- | --- | --- | --- |
-| Baseline | clean | Pending / 44 | Pending |
-| Lesson profile | lesson-04 | Pending / 44 | Pending |
+| Baseline | clean | 44/44 passed; retrieval 10/10 | reports/hw3-clean-20261016T214648.json |
+| Lesson profile | lesson-04 | 36/44 passed; retrieval 3/10 | reports/hw3-lesson-04-20261016T215211.json |
 
 ## Prediction before lesson-04
 
@@ -61,11 +61,25 @@ Expected failures:
 - RET-H05 and RET-H08: the later dispute-table rows may be omitted
   from the top-ranked broken chunk, hiding the required windows.
 
-Other cases remain uncertain: search wording, repeated searches
-and D05 may change which evidence reaches the model or whether
-it searches at all. No specific failure is predicted for them.
+Prediction commit: 995075b.
 
-Prediction commit: pending.
+Observed retrieval failures:
+RET-H01, RET-H02, RET-H05, RET-H07, RET-H08, RET-H09, RET-H10.
 
-Observed failures: pending.
-Difference from prediction: pending.
+The existing generation case HW-C13 also failed.
+
+Difference from prediction:
+All four predicted cases failed. However, RET-H01 failed because
+the agent did not search, rather than because it retrieved a
+truncated allowance row.
+
+RET-H02, RET-H05 and RET-H08 retrieved fragments that lacked
+the required dispute windows, consistent with the prediction.
+
+The additional failures RET-H07, RET-H09 and RET-H10 also
+had no tool calls. Their failure therefore cannot be attributed
+to retrieved chunk contents.
+
+RET-H03, RET-H04 and RET-H06 passed their contains checks.
+These passes confirm the expected text appeared, not that
+every aspect of the answer or retrieval was correct.

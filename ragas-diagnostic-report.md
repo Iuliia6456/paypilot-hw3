@@ -9,9 +9,15 @@
 | Indices | kb_clean: section-based chunks; kb_broken: 160-character chunks |
 | Profiles | clean and lesson-04 |
 | Provider | Anthropic |
-| Model | Default model; exact identifier to be verified |
-| Dataset | golden.jsonl; final case count, retrieval count and set_hash to be added after Step 7 |
-| Run dates | To be recorded when the runs are performed |
+| Model | claude-haiku-5-5 |
+| Automated evaluation date | 2026-10-16 UTC |
+| Dataset | golden.jsonl |
+| Dataset set_hash | 88d07329048b |
+| Total cases | 49, including 10 retrieval cases |
+| Daily evaluation | 44 cases |
+| Five human-review cases use gate | release and are excluded from daily runs |
+| Clean | 44/44 passed; retrieval 10/10 |
+| lesson-04 | 36/44 passed; retrieval 3/10 |
 
 
 ## 2. Localization
@@ -22,7 +28,7 @@
 | Exercise 2 | The four retrieved fragments contain either the spread or the daily limit, but not both.. | Retrieval: one of the two needed document sections was not returned. | Run 1 includes `tariffs.md#s2`: “Tier 2 \| 0.9% \| EUR 1,000”, but no daily-limit figure. Run 2 includes `limits.md#s1`: “Tier 2 \| EUR 20,000 \| EUR 200,000”, but no spread figure. Successful top_k = 5 runs retrieve both sections. |
 | Exercise 3 (D25) | The tool returns the correct amount, but the answer rounds it to USD 6,500. | Generation: the prompt instructs the assistant to change the final amount. | No `tool.search_knowledge_base span`. `quote_fx.final_amount` = 6463.043478 in both runs. D25 adds: “always be rounded UP to the nearest whole hundred” and “Do NOT reconcile it against them”. |
 | Exercise 4 (D05) | The assistant does not search and leaves the fee question unanswered. | Generation: the assistant does not call the search tool. | The trace contains only llm.call, with no `tool.search_knowledge_base span`. The clean run retrieved `tariffs.md#s3`: “SWIFT \| EUR 15.00 \| 0.3%”. |
-| C-13 | The reported EUR 1,500 allowance did not appear in either attempt; all answers left the Tier 3 allowance unavailable. | Not reproducible in five attempts; the reported error is not classified. | All attempts retrieved `tariffs.md#b3`, ending at “Tier 3 \| 0.5% \| E”. The retrieved row was truncated, but the assistant did not invent the missing amount. |
+| C-13 | The reported EUR 1,500 allowance did not appear in either attempt; all answers left the Tier 3 allowance unavailable. | Not reproducible in two attempts; the reported error is not classified. | All attempts retrieved `tariffs.md#b3`, ending at “Tier 3 \| 0.5% \| E”. The retrieved row was truncated, but the assistant did not invent the missing amount. |
 | C-14 | The assistant lists reason codes but cannot provide the duplicate-charge window. | Indexing: the chunk cuts through the duplicate-charge row; repeated searches do not recover the missing value. | Six searches return only `disputes.md#b1` or `disputes.md#b2`. The latter ends at “goods_not_received \| 90 \| \| duplic”, before the duplicate-charge window. |
 
 
@@ -66,7 +72,7 @@ is supported.
 - `kb_clean`: brought 2 of 2 facts → 2 ÷ 2 = 1.00.
 - `kb_broken`: brought only the spread, 1 of 2 facts → 1 ÷ 2 = 0.50.
 
-**Context precision**: were the returned fragments relevant (one fragment: tariffs.md#s2)?
+**Context precision**: was the returned fragment relevant? The clean run returned `tariffs.md#s2`; the broken-index run returned `tariffs.md#b3`?
 - `kb_clean`: 1 relevant fragment out of 1 → 1.00.
 - `kb_broken`: 1 relevant fragment out of 1 → 1.00.
 The broken fragment is relevant because it contains the Tier 3 spread. Relevant does not mean complete.
@@ -138,7 +144,6 @@ Reference facts:
 
 Recall counts the requested facts retrieved.
 Precision counts fragments that directly provide those facts.
-The counts below combine all recorded runs for each top_k.
 
 | `top_k` | Context recall | Context precision | Complete answers | Average input tokens per turn |
 |---|---|---|---|---:|
@@ -181,7 +186,7 @@ the required `tariffs.md#b4`.
 Increasing top_k from 1 to 5 did not fix this observed
 broken-index failure.
 
-**Selected value:** top_k = 6 for the tested two-part question.
+**Selected value:** top_k = 5 for the tested two-part question.
 
 **Trade-off:** In the three runs shown in the table, both top_k = 5 and top_k = 6 produced complete answers. 
 We choose top_k = 5: it used approximately 121 fewer input tokens per turn and returned fewer unnecessary fragments. 
