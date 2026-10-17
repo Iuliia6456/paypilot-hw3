@@ -10,14 +10,14 @@
 | Profiles | clean and lesson-04 |
 | Provider | Anthropic |
 | Model | claude-haiku-5-5 |
-| Automated evaluation date | 2026-10-16 UTC |
+| Automated evaluation date | 2026-10-17 UTC |
 | Dataset | golden.jsonl |
-| Dataset set_hash | 88d07329048b |
+| Dataset set_hash | 7ed831290a4b |
 | Total cases | 49, including 10 retrieval cases |
 | Daily evaluation | 44 cases |
 | Five human-review cases use gate | release and are excluded from daily runs |
 | Clean | 44/44 passed; retrieval 10/10 |
-| lesson-04 | 36/44 passed; retrieval 3/10 |
+| lesson-04 | 38/44 passed; retrieval 5/10 |
 
 
 ## 2. Localization

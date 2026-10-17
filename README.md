@@ -9,12 +9,12 @@ sets directory, then run from the evaluation kit directory:
 
     docker compose run --rm eval --set hw3 --dry-run
     docker compose run --rm eval --set hw3 --profile clean
-    docker compose run --rm eval --set golden --profile lesson-04
+    docker compose run --rm eval --set hw3 --profile lesson-04
 
 Use a local PayPilot stand with:
 CLOCK_OVERRIDE=2026-09-15T10:00:00Z
 
-**Dataset set_hash**: 88d07329048b
+**Current dataset set_hash**: 7ed831290a4b
 
 **Dataset**: 49 cases, including 10 retrieval cases.<br>
 **Daily run**: 44 cases. Five release-only human cases are excluded.
@@ -31,18 +31,21 @@ Validation was performed using a copy named sets/hw3.jsonl:
 | RET-H02 | Complaint C-14 | disputes.md, “Reason codes and chargeback windows” table; line 11 - duplicate-charge window |
 | RET-H03 | Corpus | limits.md, line 11 - Tier 1 monthly limit |
 | RET-H04 | Corpus | limits.md, line 13 - Tier 3 daily limit |
-| RET-H05 | Corpus | disputes.md, line 13 - unauthorized_debit window |
-| RET-H06 | Corpus | tariffs.md, line 22 - SEPA fee |
-| RET-H07 | Corpus | tariffs.md, lines 24 and 26 - card-payment fee and calculation basis |
+| RET-H05 | Corpus | disputes.md, “Reason codes and chargeback windows”, goods_not_received row — 90 days |
+| RET-H06 | Corpus | tariffs.md, “Transfer fees by type”, Internal row - flat fee EUR 0.00 |
+| RET-H07 | Corpus | tariffs.md, line 14 - Tier 1 free monthly conversion allowance: EUR 500 |
 | RET-H08 | Corpus | disputes.md, line 12 - service_not_rendered window |
-| RET-H09 | Corpus | tariffs.md, line 14 - Tier 1 spread; applicability paragraph beginning at line 9 |
+| RET-H09 | Corpus | limits-operations.md, “Tier changes” - effective on the first calendar day of the following month |
 | RET-H10 | Corpus | limits.md, line 12 - Tier 2 monthly limit |
 
 The contains assertions check selected text in the answer.
 They do not prove that search occurred or that every statement
 is correct. Retrieval failures will be diagnosed from traces.
 
-## Runs
+## Original runs - before feedback
+
+These runs used dataset set_hash 88d07329048b.
+The prediction and analysis below refer to that original version.
 
 | Run | Profile | Result | Report |
 | --- | --- | --- | --- |
@@ -115,5 +118,29 @@ On lesson-04:
   or absent from the single returned fragment.
 - RET-H03 and RET-H04 may pass.
 
+**Prediction commit**: c1afe8e.
 
-Revised results: pending.
+| Revised run | Profile | Result | Report |
+| --- | --- | --- | --- |
+| Baseline | clean | 44/44 passed; retrieval 10/10 | reports/hw3-clean-20261017T180644.json |
+| Lesson profile | lesson-04 | 38/44 passed; retrieval 5/10 | reports/hw3-lesson-04-20261017T181206.json |
+
+Failed retrieval cases:
+RET-H01, RET-H02, RET-H05, RET-H06 and RET-H09.
+The existing generation case HW-C13 also failed.
+
+### Comparison with the prediction
+
+- RET-H01 and RET-H02 failed as expected. H01 did search,
+  contrary to the predicted cause, but retrieved a truncated row.
+- RET-H05 failed because searches returned `disputes.md#b1`
+  without the window. RET-H06 failed because no search occurred.
+- RET-H09 was uncertain and failed: `glossary.md#b5` lacked
+  the tier-change effective date.
+- RET-H03, RET-H04 and RET-H07 passed as expected.
+- RET-H08 was a false pass: “90 days” referred to
+  goods_not_received, not the requested service_not_rendered.
+- RET-H10 passed the text check but remained uncertain about
+  the monthly limit. RET-H04 similarly lacked a clear daily-limit header.
+
+HW-C13 failed without any tool calls.
