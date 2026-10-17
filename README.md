@@ -83,3 +83,37 @@ to retrieved chunk contents.
 RET-H03, RET-H04 and RET-H06 passed their contains checks.
 These passes confirm the expected text appeared, not that
 every aspect of the answer or retrieval was correct.
+
+---
+## Revision after feedback
+
+**Revised dataset set_hash**: 7ed831290a4b.<br>
+The dataset still contains 49 cases: 44 daily and five release cases.
+
+Four cases were replaced:
+- RET-H05: goods_not_received dispute window.
+- RET-H06: Internal transfer flat fee.
+- RET-H07: Tier 1 free monthly conversion allowance.
+- RET-H09: effective date of a tier change.
+
+### Prediction before the revised runs
+
+On clean, I expect all ten retrieval cases to pass.
+
+On lesson-04:
+- RET-H01 and RET-H10 are likely to fail again: the previous
+  run skipped search for these questions.
+- RET-H02 and RET-H08 are likely to fail because the retrieved
+  dispute fragments previously omitted their required windows.
+- RET-H05 may pass: disputes.md#b2 contains goods_not_received
+  and its 90-day window.
+- RET-H06 may pass: tariffs.md#b4 contains the complete Internal
+  fee row.
+- RET-H07 may pass: tariffs.md#b3 contains the complete Tier 1
+  allowance.
+- RET-H09 is uncertain: the effective-date sentence may be split
+  or absent from the single returned fragment.
+- RET-H03 and RET-H04 may pass.
+
+
+Revised results: pending.

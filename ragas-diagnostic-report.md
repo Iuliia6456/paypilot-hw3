@@ -204,6 +204,23 @@ Three successful runs do not guarantee reliability across other questions.
 | Retrieval | Tune search queries, ranking and top_k. Provisionally use top_k = 5 for the tested two-part question. | More returned text increases token usage; reranking adds processing time and possibly model cost. | More results can bring irrelevant or conflicting information. | No-not as a fix for this retrieval defect. Change top_k, ranking or the search method. |
 | Generation | Remove D25’s rounding instruction and require final amounts to match tool results to two decimal places. | Prompt maintenance and regression tests. Additional searches can increase latency and token usage. | Stricter grounding may produce more refusals when evidence is missing. | Yes, but the fix still requires testing. |
 
+**Estimated implementation time:**
+
+- Retrieval: 5 minutes to adjust top_k, plus 40–60 minutes
+  to run regression tests and review retrieved fragments,
+  answer completeness, token usage and latency.
+  Total: approximately 45–65 minutes.
+  This covers configuration changes to the existing search,
+  not adding a reranker or hybrid search.
+
+- Generation: 5–10 minutes to remove the incorrect rounding
+  rule and check the revised prompt, plus 40–60 minutes
+  to run regression tests and compare final amounts with
+  tool results.
+  Total: approximately 45–70 minutes.
+
+These are planning estimates, not measured implementation times.
+
 **Illustrative reindexing budget:**
 
 Assumptions:
@@ -265,15 +282,3 @@ changes from Ship it to Zero regulatory risk.
 
 ---
 
-## Чекліст перед здачею
-
-- [ ] У розділі 1 заповнено всі рядки, зокрема кількість retrieval-кейсів і `set_hash`.
-- [ ] У розділі 2 кожен рядок має доказ із трейсу, а не цитату відповіді; C-13 і C-14 класифіковано або позначено «не відтворюється».
-- [ ] У розділі 3 між прогонами змінився лише індекс, і це названо явно.
-- [ ] Біля кожної метрики показано рахунок «n з m».
-- [ ] У розділі 4 є результат п'яти прогонів D25 і `final_amount` з трейсу.
-- [ ] У розділі 5 три значення `top_k` з токенами й перевірка на `kb_broken`; названо ціну обраного значення.
-- [ ] У розділі 6 заповнено всі три рядки таблиці, є клас збоїв, який проходить усі три метрики, і джерело еталону.
-- [ ] Останній рядок заповнено всіма трьома пунктами.
-- [ ] У `golden.jsonl` щонайменше 10 кейсів з `layer: retrieval` і `oracle: corpus`, у жодного немає порожнього `reference`.
-- [ ] `docker compose run --rm eval --set golden --profile clean` на чистому клоні кіту доходить до кінця і пише звіт.
